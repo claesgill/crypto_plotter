@@ -12,9 +12,11 @@ Having the luxury of owning a 3D printer, I designed a small case to fit both mo
 
 ## Content
 1. [Requrements](#requrements)
-  1. [Software](#software)
-  2. [Hardware](#hardware)
-2. []()
+    1. [Software](#software)
+    2. [Hardware](#hardware)
+2. [Circuit diagram](#circuit-diagram)
+3. [Usage](#usage)
+    1. [Debug](#debug)
 
 ## Requrements
 ### Software
