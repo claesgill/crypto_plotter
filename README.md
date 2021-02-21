@@ -8,7 +8,7 @@ Using the ESP8266 and connecting to my local WiFi, I was able to fetch data from
 
 Having the luxury of owning a 3D printer, I designed a small case to fit both modules. Below is an image of the final result.
 
-<img height=300 alt="Case and modules" src="images/case.heic" />
+<img height=300 alt="Case and modules" src="IMG_0414.HEIC" />
 
 ## Content
 1. []()
