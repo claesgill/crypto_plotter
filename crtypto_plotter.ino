@@ -60,7 +60,7 @@ void setup () {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
-  boot_screen();
+  bootScreen();
   waitingForData();
 }
 
@@ -230,7 +230,7 @@ String page(String account, float balance, float hashrate, bool accStatus, Strin
   return content;
 }
 
-void boot_screen(){
+void bootScreen(){
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
