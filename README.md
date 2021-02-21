@@ -50,7 +50,7 @@ After setting your variables you would need to connect your ESP8266 to the compu
 
 Upload the sketch and wait for it to fetch the data. The OLED and serial monitor will display the IP you can visit to check out the webpage.
 
-> :sweat_smile: The `bootScreen()` is only there to make the device look interesting when booting. I basically only waste like 5 seconds.
+> :sweat_smile: The `bootScreen()` is only there to make the device look interesting when booting. It basically waste like 5 seconds.
 
 ### Debug
 After running the code you can see outputs in the serial monitor at baudrate `115200`.
