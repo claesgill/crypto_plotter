@@ -33,7 +33,7 @@ Having the luxury of owning a 3D printer, I designed a small case to fit both mo
 - OLED I2c IIC LCD Screen Module
 
 ## Circuit diagram
-<img height=300 alt="Diagram" src="images/esp8266_oled.png" />
+<img height=300 alt="Diagram" src="images/esp8266_oled.svg" />
 
 ## Usage
 There are a few variables that needs to be set befor building the code to the ESP8266.
