@@ -27,154 +27,166 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 int counter = 0;
 
-bool s = false;
-String a = "";
-float b  = 0.0;
-float hr = 0.0;
-float h  = 0.0;
-String i = "";
+bool   accStatus = false;
+String account   = "";
+float  balance   = 0.0;
+float  hashrate  = 0.0;
+float  h1        = 0.0;
+String id        = "None";
+
+int oled_mode    = 0;
+bool makeRequest = true;
+
+void ICACHE_RAM_ATTR makeAPIRequest();
+void ICACHE_RAM_ATTR changeOledMode();
 
 void setup () {
   Serial.begin(115200);
   delay(100);
-  Serial.print("Connecting to wifi: ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected!");
-  Serial.print("Server IP: ");
-  Serial.println(WiFi.localIP());
-
-  // Webserver
-  server.on("/", homePage);
-  server.onNotFound(homePageNotFound);
-  server.begin();
-  Serial.println("HTTP server started");
 
   // Initialize OLED
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
-  bootScreen();
-  waitingForData();
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.cp437(true);
+  display.println("cjg Engine booting");
+  display.display();
+  display.println("Connecting to WiFi:");
+  display.println(ssid);
+  display.display();
+  
+  Serial.print("Connecting to WiFi: ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+    display.print(".");
+    display.display();
+  }
+  Serial.println("");
+  Serial.println("WiFi connected!");
+  Serial.print("Server IP: ");
+  Serial.println(WiFi.localIP());
+
+  display.println();
+  display.println("WiFi connected!");
+  display.display();
+
+  // Webserver
+  server.on("/", homePage);
+  server.onNotFound(homePageNotFound);
+  server.begin();
+  Serial.println("HTTP server started");
+  
+  display.println("HTTP server started");
+  display.println("Server IP:");
+  display.println(WiFi.localIP());  
+  display.display();
+  delay(1000);
+  
+  // Setting interrupt pin
+  attachInterrupt(digitalPinToInterrupt(D7), makeAPIRequest, RISING);
+  attachInterrupt(digitalPinToInterrupt(D8), changeOledMode, RISING);
 }
 
 void loop() {
   server.handleClient();
+
+  if(makeRequest){
+    makeRequest = false;
+    fetchDataFromAPI();
+  }
+
+  // Output to serial monitor
+  switch(oled_mode){
+    case 1:
+      oledDisplayStats();
+      break;
+    case 2:
+      oledDisplayWorker();
+      break;
+    case 3:
+      oledDisplayBalance();
+      break;
+    case 98:
+      break;
+    case 99:
+      break;
+    default:
+      oledDefaultScreen();
+      break;
+  }
+}
+
+void fetchDataFromAPI(){
+  oledFetchingData(0);
   
-  if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
-    HTTPClient http;  //Declare an object of class HTTPClient
-    WiFiClientSecure client;
-    int httpCode = 0;
+  if (WiFi.status() == WL_CONNECTED) {  //Check WiFi connection status
+    HTTPClient http;                    //Declare an object of class HTTPClient
+    WiFiClientSecure client;            //Declare an object of class WiFiClientSecure
+    client.setInsecure();               // Insecure because of HTTPS connection
+    client.connect(apiGeneralInfo, 443);
+    http.begin(client, apiGeneralInfo);
 
-    if (counter % 5000 == 0){
-      Serial.println(counter);
-
-      client.setInsecure();
-      client.connect(apiGeneralInfo, 443);
-      http.begin(client, apiGeneralInfo);
-      httpCode = http.GET();
-    }
-
-    if (httpCode > 0 && counter % 5000 == 0) {
-      String payload = http.getString();   //Get the request response payload
+    oledFetchingData(40);
+    
+    if (http.GET() > 0) { 
+      String payload = http.getString(); //Get the request response payload
 
       // Parsing
       StaticJsonDocument<500> doc;
       deserializeJson(doc, payload);
       // Parameters
-      const bool accStatus = doc["status"]; // Status
-      const String account = doc["data"]["account"];
-      const float balance  = doc["data"]["balance"];
-      const float hashrate = doc["data"]["hashrate"];
+      const bool _accStatus = doc["status"]; // Status
+      const String _account = doc["data"]["account"];
+      const float _balance  = doc["data"]["balance"];
+      const float _hashrate = doc["data"]["hashrate"];
 
+      oledFetchingData(60);
+      
       JsonObject avgHashrate = doc["data"]["avgHashrate"];
-      const float h1  = avgHashrate["h1"];
-      const float h3  = avgHashrate["h3"];
-      const float h6  = avgHashrate["h6"];
-      const float h12 = avgHashrate["h12"];
-      const float h24 = avgHashrate["h24"];
+      const float _h1  = avgHashrate["h1"];
+      const float _h3  = avgHashrate["h3"];
+      const float _h6  = avgHashrate["h6"];
+      const float _h12 = avgHashrate["h12"];
+      const float _h24 = avgHashrate["h24"];
+
+      oledFetchingData(80);
 
       JsonObject workers = doc["data"]["workers"][0];
-      const String id       = workers["id"];
-      const float lastShare = workers["lastshare"];
-      const int rating      = workers["rating"];
+      const String _id       = workers["id"];
+      const float _lastShare = workers["lastshare"];
+      const int _rating      = workers["rating"];
 
-      // Setting HTML variables
-      s  = accStatus;
-      a  = account;
-      b  = balance;
-      hr = hashrate;
-      h  = h1;
-      i  = id;
-      
-      // Output to serial monitor
-      Serial.print("Status: ");     Serial.println(String(accStatus));
-      Serial.print("Account: ");    Serial.println(account);
-      Serial.print("Balance: ");    Serial.println(balance, 8);
-      Serial.print("Hashrate: ");   Serial.println(hashrate);
-      Serial.print("Id: ");         Serial.println(id);
-      Serial.print("Last share: "); Serial.println(lastShare);
-      Serial.print("Rating: ");     Serial.println(rating);
-      Serial.print("H1: ");         Serial.println(h1);
-      Serial.print("H3: ");         Serial.println(h3);
-      Serial.print("H6: ");         Serial.println(h6);
-      Serial.print("H12: ");        Serial.println(h12);
-      Serial.print("H24: ");        Serial.println(h24);
+      // Setting to global variables
+      accStatus  = _accStatus;
+      account    = _account;
+      balance    = _balance;
+      hashrate   = _hashrate;
+      h1         = _h1;
+      id         = _id;
 
-      // Display to OLED
-      display.clearDisplay();
-      display.setCursor(0, 0);
-      display.setTextSize(1);              // Normal 1:1 pixel scale
-      display.setTextColor(SSD1306_WHITE); // Draw white text
-      display.cp437(true);                 // Use full 256 char 'Code Page 437' font
-      
-      display.print("  IP: ");
-      display.println(WiFi.localIP());
-      
-      display.print("Account:  ");
-      display.print(account.charAt(0));
-      display.print(account.charAt(1));
-      display.print(account.charAt(2));
-      display.print(account.charAt(3));
-      display.print("...");
-      display.print(account.charAt(account.length()-3));
-      display.print(account.charAt(account.length()-2));
-      display.println(account.charAt(account.length()-1));
-      
-      display.write("Balance:  ");
-      display.print(balance, 5);
-      display.println(" ETH");
-      
-      display.write("HR     :  ");
-      display.print(hashrate);
-      display.println(" Mh/s");
-    
-      display.println("  Worker");
-      display.print("Status:   ");
-      (accStatus ? display.println("Online") : display.println("Offline"));
-      display.print("Id    :   ");
-      display.println(id);
-      display.print("Avg HR:   ");
-      display.print(h1);
-      display.println(" Mh/s");
-      
-      display.display();
+      oledFetchingData(100);
+      delay(1000);
     } else {
-      //Serial.print("HTTP Code: ");
-      //Serial.println(httpCode);
-      // TODO: Error message to OLED and webserver
+      Serial.print("HTTP Code: ");
+      Serial.println(http.GET());
+      oledErrorMessage("Fetching data", http.GET());
+      oled_mode = 98;
     }
-    http.end();   //Close connection
+    http.end(); //Close connection
+  } else{
+    Serial.println("WiFi is not connected!");
+    oledErrorMessage("No WiFi...", WiFi.status());
+    oled_mode = 99;
   }
-  // delay(150000);    //Send a request every 30 seconds
-  counter++;
-  delay(1000);
 }
 
 void homePageNotFound(){
@@ -187,7 +199,7 @@ void homePageNotFound(){
 }
 
 void homePage(){
-  server.send(200, "text/html", page(a, b, hr, s, i, h));
+  server.send(200, "text/html", page(account, balance, hashrate, accStatus, id, h1));
 }
 
 String page(String account, float balance, float hashrate, bool accStatus, String id, float h1){
@@ -230,38 +242,147 @@ String page(String account, float balance, float hashrate, bool accStatus, Strin
   return content;
 }
 
-void bootScreen(){
+void oledDisplayStats(){
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 0);
   display.cp437(true);
-  display.println("cjg Engine");
-  display.display();
-  delay(1000);
 
-  display.print("\nBooting");
-  int numDots = 3; 
-  for(int i=0; i<=numDots; i++){
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.println("cjg Engine");
-    display.print("\nBooting");
-    char str[numDots];
-    memset(str, '.', i);
-    str[i] = '\0';
-    display.print(str);
-    display.display();
-    delay(1000);
-  }
+  display.println("Balance");
+  display.setTextSize(2);
+  display.print(balance, 5);
+  display.setTextSize(1);
+  display.println(" ETH");
+  display.setTextSize(1);
+  display.println("\n");
+  display.println("Hashrate");
+  display.setTextSize(2);
+  display.print(hashrate);
+  display.setTextSize(1);
+  display.println(" Mh/s");
+
+  display.display();
 }
 
-void waitingForData(){
+void oledDisplayWorker(){
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(10, 10);
+  display.setCursor(10, 0);
   display.cp437(true);
-  display.println("Fetching data...");
+
+  display.println("  Worker");
+  display.print("Status: ");
+  display.setTextSize(2);
+  (accStatus ? display.println("Online") : display.println("Off"));
+  display.setTextSize(1);
+  display.print("Id    : ");
+  display.setTextSize(2);
+  display.println(id);
+  display.setTextSize(1);
+  display.print("Avg HR: ");
+  display.setTextSize(2);
+  display.print(h1);
+  display.setTextSize(1);
+  display.println("Mhs");
+  
   display.display();
+}
+
+void oledDisplayBalance(){
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.cp437(true);
+
+  display.println("Balance");
+  display.setTextSize(1);
+  display.println();
+  display.setTextSize(3);
+  display.println(balance, 5);
+  display.setTextSize(1);
+  display.println("ETH");
+  display.display();
+}
+
+void oledDefaultScreen(){
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.setTextSize(1);              // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE); // Draw white text
+  display.cp437(true);                 // Use full 256 char 'Code Page 437' font
+  
+  display.print("  IP: ");
+  display.println(WiFi.localIP());
+  
+  display.print("Account:  ");
+  display.print(account.charAt(0));
+  display.print(account.charAt(1));
+  display.print(account.charAt(2));
+  display.print(account.charAt(3));
+  display.print("...");
+  display.print(account.charAt(account.length()-3));
+  display.print(account.charAt(account.length()-2));
+  display.println(account.charAt(account.length()-1));
+  
+  display.write("Balance:  ");
+  display.print(balance, 5);
+  display.println(" ETH");
+  
+  display.write("HR     :  ");
+  display.print(hashrate);
+  display.println(" Mh/s");
+
+  display.println("  Worker");
+  display.print("Status:   ");
+  (accStatus ? display.println("Online") : display.println("Offline"));
+  display.print("Id    :   ");
+  display.println(id);
+  display.print("Avg HR:   ");
+  display.print(h1);
+  display.println(" Mh/s");
+  
+  display.display();
+}
+
+void oledErrorMessage(String str, int errorCode){
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.setTextSize(2);              // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE); // Draw white text
+  display.cp437(true);                 // Use full 256 char 'Code Page 437' font
+  
+  display.print("ERROR: ");
+  display.println(errorCode);
+  display.println(str);
+  display.display();
+}
+
+void oledFetchingData(int prosentage){
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 10);
+  display.cp437(true);
+  display.print("Fetching data: ");
+  display.print(prosentage);
+  display.println("%");
+  display.display();
+}
+
+void ICACHE_RAM_ATTR changeOledMode(){
+  Serial.println("Interrupting - right button!");
+  if (oled_mode > 4){
+    oled_mode = 0;
+  } else {
+    oled_mode++;
+  }
+}
+
+void ICACHE_RAM_ATTR makeAPIRequest(){
+  Serial.println("Interrupting - left button!");
+  ( (oled_mode > 4) ? oled_mode = 0 : oled_mode);
+  makeRequest = true;
 }
