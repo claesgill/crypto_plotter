@@ -4,11 +4,15 @@ This is a mini-project that monitors your crypto account and miner (worker).
 ## But why? :shrug:
 As you easily can monitor your account and worker online, the real purpouse of the project was to learn about the ESP8266 and OLED module.
 
-Using the ESP8266 and connecting to my local WiFi, I was able to fetch data from the [Nanopool API](https://eth.nanopool.org/api) and plot it on the OLED display. As the module can serve as a server I also used the data to display stats on the local servers webpage.
+Using the ESP8266 and connecting to my local WiFi, I was able to fetch data from the [Nanopool API](https://eth.nanopool.org/api) and plot it on the OLED display. As the module can serve as a server I also used the data to display stats on the local servers webpage. I also added two buttons, one for changing how the data was displayed and one for making a new request for the API.
 
 Having the luxury of owning a 3D printer, I designed a small case to fit both modules. Below is an image of the final result.
 
-<img height=500 alt="Case and modules" src="images/case.png" />
+<img height=500 alt="Case and modules" src="images/default.jpg" />
+<img height=500 alt="Case and modules" src="images/stats.jpg" />
+<img height=500 alt="Case and modules" src="images/worker.jpg" />
+<img height=500 alt="Case and modules" src="images/balance.jpg" />
+<img height=500 alt="Case and modules" src="images/fetch.jpg" />
 
 ## Content
 1. [Requrements](#requrements)
@@ -35,7 +39,7 @@ Having the luxury of owning a 3D printer, I designed a small case to fit both mo
 - OLED I2c IIC LCD Screen Module
 
 ## Circuit diagram
-<img height=300 alt="Diagram" src="images/esp8266_oled.svg" />
+<img height=300 alt="Diagram" src="images/diagram.svg" />
 
 ## Usage
 There are a few variables that needs to be set befor building the code to the ESP8266.
