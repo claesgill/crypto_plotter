@@ -9,27 +9,7 @@ Using the ESP8266 and connecting to my local WiFi, I was able to fetch data from
 Having the luxury of owning a 3D printer, I designed a small case to fit both modules. Below is an image of the final result.
 
 <img alt="Case and modules" height=300 src="images/default.jpg" /> <img alt="Case and modules" height=300  src="images/stats.jpg" /> <img alt="Case and modules" height=300  src="images/worker.jpg" />
-
-
-<div>
-  <div class="column" style="float: left; width: 33.33%; padding: 5px; box-sizing: border-box;">
-    <img alt="Case and modules" height=300 src="images/default.jpg" />
-  </div>
-  <div class="column" style="float: left; width: 33.33%; padding: 5px; box-sizing: border-box;">
-    <img alt="Case and modules" height=300  src="images/stats.jpg" />
-  </div>
-  <div class="column" style="float: left; width: 33.33%; padding: 5px; box-sizing: border-box;">
-    <img alt="Case and modules" height=300  src="images/worker.jpg" />
-  </div>
-</div>
-<div>
-  <div class="column" style="float: left; width: 33.33%; padding: 5px; box-sizing: border-box;">
-    <img alt="Case and modules" height=300 src="images/balance.jpg" />
-  </div>
-  <div class="column" style="float: left; width: 33.33%; padding: 5px; box-sizing: border-box;">
-    <img alt="Case and modules" height=300  src="images/fetch.jpg" />
-  </div>
-</div>
+<img alt="Case and modules" height=300 src="images/balance.jpg" /> <img alt="Case and modules" height=300  src="images/fetch.jpg" />
 
 ## Content
 1. [Requrements](#requrements)
