@@ -8,6 +8,10 @@ Using the ESP8266 and connecting to my local WiFi, I was able to fetch data from
 
 Having the luxury of owning a 3D printer, I designed a small case to fit both modules. Below is an image of the final result.
 
+![Case and modules](images/default.jpg "title-1") ![Case and modules](images/stats.jpg "title-2") ![Case and modules](images/stats.jpg "title-2")
+![Case and modules](images/balance.jpg "title-1") ![Case and modules](images/fetch.jpg "title-2")
+
+
 <div>
   <div class="column" style="float: left; width: 33.33%; padding: 5px; box-sizing: border-box;">
     <img alt="Case and modules" height=300 src="images/default.jpg" />
