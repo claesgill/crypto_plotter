@@ -10,7 +10,7 @@ Having the luxury of owning a 3D printer, I designed a small case to fit both mo
 
 <div>
   <div class="column" style="float: left; width: 33.33%; padding: 5px; box-sizing: border-box;">
-    <img alt="Case and modules" style="width:30%" src="images/default.jpg" />
+    <img alt="Case and modules" height=300 src="images/default.jpg" />
   </div>
   <div class="column" style="float: left; width: 33.33%; padding: 5px; box-sizing: border-box;">
     <img alt="Case and modules" style="width:30%"  src="images/stats.jpg" />
