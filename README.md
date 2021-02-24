@@ -42,19 +42,17 @@ Having the luxury of owning a 3D printer, I designed a small case to fit both mo
 <img height=300 alt="Diagram" src="images/diagram.svg" />
 
 ## Usage
-There are a few variables that needs to be set befor building the code to the ESP8266.
+There are a few variables that needs to be set before uploading the code to the ESP8266.
 ```cpp
 const char* ssid = "<your WiFi name";
 const char* password = "<your WiFi password>";
 const String accountId = "<your account ID>";
 ```
-Also, keep in mind that your OLED module might need another `SCREEN_ADDRESS`. The default is `0x3C` for the 128x32 display.
+:warning: _Keep in mind that your OLED module might need another `SCREEN_ADDRESS`. The default is `0x3C` for the 128x32 display._
 
 After setting your variables you would need to connect your ESP8266 to the computer. In the IDE choose board `LOLIN(WEMOS) D1 R2 & mini`, keep the rest as default and select your `PORT`.
 
 Upload the sketch and wait for it to fetch the data. The OLED and serial monitor will display the IP you can visit to check out the webpage.
-
-> :sweat_smile: The `bootScreen()` is only there to make the device look interesting when booting. It basically waste like 5 seconds.
 
 ### Debug
 After running the code you can see outputs in the serial monitor at baudrate `115200`.
