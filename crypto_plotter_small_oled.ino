@@ -7,9 +7,9 @@
 ESP8266WebServer server(80);
 
 // Credentials & Account ETH
-const char* ssid = "Claes AS";
-const char* password = "Maddargaskar";
-const String accountId = "0xFc3e4Bdf93d738f603dADe9Dab9306F0D4079978";
+const char* ssid = "<your WiFi name";
+const char* password = "<your WiFi password>";
+const String accountId = "<your account ID>";
 const String host = "https://api.nanopool.org/v1/eth/balance/" + accountId;
 const String apiGeneralInfo = "https://api.nanopool.org/v1/eth/user/" + accountId;
 
