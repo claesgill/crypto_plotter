@@ -32,7 +32,7 @@ Having the luxury of owning a 3D printer, I designed a small case to fit both mo
 - Adafruit SSD1306 >= v2.4.3
 
 #### Board Manager
-- esp8266 >= v2.7.4
+- esp8266 >= v2.7.4 ([see video for installation](https://www.youtube.com/watch?v=OC9wYhv6juM&t=23s))
 
 ### Hardware
 - Wacom ESP8266 D1 mini
